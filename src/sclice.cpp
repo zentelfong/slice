@@ -141,6 +141,7 @@ Slice &Slice::operator=(Slice &&slice) {
     slice.data_.inlined.length = 0;
   } else {
     data_.inlined = slice.data_.inlined;
+    slice.data_.inlined.length = 0;
   }
   return *this;
 }
@@ -163,6 +164,14 @@ Slice Slice::Clone() const {
   return slice;
 }
 
+void Slice::Clear() {
+  if (refcount_) {
+    refcount_->Unref();
+    refcount_ = nullptr;
+  }
+  data_.inlined.length = 0;
+}
+
 Slice Slice::Sub(size_t begin, size_t end) const {
   if (begin > end) {
     throw std::invalid_argument("invalied param");
@@ -181,6 +190,7 @@ Slice Slice::Sub(size_t begin, size_t end) const {
   } else {
     if (refcount_ != nullptr) {
       // Build the result
+      refcount_->Ref();
       subset.refcount_ = refcount_;
       // Point into the source array
       subset.data_.refcounted.bytes = data_.refcounted.bytes + begin;
@@ -253,7 +263,7 @@ void Slice::Dump() const {
 
   printf("Slice:%u", (uint32_t)length);
   int m = 0;
-  for (int i = 0; i < length; i++) {
+  for (size_t i = 0; i < length; i++) {
     if (i % 16 == 0) {
       printf("\n  0x%04x: ", (8 * m));
       m++;

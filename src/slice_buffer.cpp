@@ -1,5 +1,6 @@
 #include "slice_buffer.h"
 #include <string.h>
+#include <stdexcept>
 #include <utility>
 
 // grow a buffer; requires GRPC_SLICE_BUFFER_INLINE_ELEMENTS > 1
@@ -79,6 +80,14 @@ void SliceBuffer::Add(Slice const& slice) {
   length_ += slice.GetLength();
   count_ = out + 1;
 }
+
+void SliceBuffer::Add(SliceBuffer const& slice_buffer) {
+  for (size_t i = 0; i < slice_buffer.GetCount(); ++i) {
+    auto slice = slice_buffer.GetAt(i);
+    Add(slice);
+  }
+}
+
 
 Slice SliceBuffer::PopFront() {
   if (count_ == 0) {

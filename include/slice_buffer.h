@@ -10,9 +10,19 @@ public:
   SliceBuffer();
   ~SliceBuffer();
 
+  SliceBuffer(const SliceBuffer&) = delete;
+  SliceBuffer(SliceBuffer&&) = delete;
+  SliceBuffer& operator=(const SliceBuffer&) = delete;
+  SliceBuffer& operator=(SliceBuffer&&) = delete;
+
+
   /// @brief add slice to tail.
   /// @param slice 
   void Add(Slice const& slice);
+
+  /// @brief add slice buffer to tail.
+  /// @param slice buffer 
+  void Add(SliceBuffer const& slice_buffer);
 
 
   /// @brief pop front slice.

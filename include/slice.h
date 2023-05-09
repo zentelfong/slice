@@ -28,25 +28,36 @@ public:
 
   /// @brief get data
   /// @return data
-  uint8_t const* GetData() const {
+  inline uint8_t const* GetData() const {
     return refcount_ ? data_.refcounted.bytes : data_.inlined.bytes;
   }
 
   /// @brief get mutable data
   /// @return data
-  uint8_t* MutableData() {
+  inline uint8_t* MutableData() {
     return refcount_ ? data_.refcounted.bytes : data_.inlined.bytes;
   }
 
   /// @brief get length
   /// @return length
-  size_t GetLength() const {
+  inline size_t GetLength() const {
     return refcount_ ? data_.refcounted.length : data_.inlined.length;
+  }
+
+  inline std::string GetString() const {
+    return std::string(reinterpret_cast<char const*>(GetData()), GetLength());
+  }
+
+  /// @brief is empty.
+  inline bool IsEmpty() const {
+    return GetLength() == 0;
   }
 
   /// @brief clone a slice
   /// @return slice
   Slice Clone() const;
+
+  void Clear();
 
   /// @brief sub
   /// @param begin 
